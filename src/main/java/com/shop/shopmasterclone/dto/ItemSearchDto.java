@@ -1,4 +1,4 @@
-package com.shop.shopmasterclone.entity;
+package com.shop.shopmasterclone.dto;
 
 import com.shop.shopmasterclone.constant.ItemSellStatus;
 import lombok.Getter;
