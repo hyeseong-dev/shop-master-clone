@@ -40,6 +40,24 @@ class OrderTest {
     @PersistenceContext
     EntityManager entityManager;
 
+    // 테스트 코드 수행: OrderItem 클래스의 order 필드의 ManyToOne어노테이션의 fetch 매개변수의 값을 EARGER로 변경시켜야 함.
+//    @Test
+//    @DisplayName("주문 항목 조회 시 주문은 즉시 로딩되어야 함")
+//    public void givenOrderItemId_whenFindById_thenOrderShouldBeEagerlyLoaded() {
+//        // Given
+//        Order order = this.createOrder();
+//        Long orderItemId = order.getOrderItems().get(0).getId();
+//        entityManager.flush();
+//        entityManager.clear();
+//
+//        // When
+//        OrderItem orderItem = orderItemRepository.findById(orderItemId)
+//                .orElseThrow(EntityNotFoundException::new);
+//
+//        // Then
+//        assertTrue(Hibernate.isInitialized(orderItem.getOrder()));
+//    }
+
     @Test
     @DisplayName("주문 항목 조회 시 주문은 지연 로딩되어야 함")
     public void givenOrderItemId_whenFindById_thenOrderShouldBeLazyLoaded() {
