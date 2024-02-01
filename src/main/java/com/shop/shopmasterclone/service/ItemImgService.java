@@ -18,7 +18,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Transactional
 public class ItemImgService {
-    @Value("itemImgLocation")
+    @Value("${itemImgLocation}")
     private String itemImgLocation;
 
     private final ItemImgRepository itemImgRepository;
