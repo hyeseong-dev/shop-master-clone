@@ -74,7 +74,7 @@
                 <td>
                     <a th:href="'/admin/item/'+${item.id}" th:text="${item.itemNm}"></a>
                 </td>
-                <td th:text="${item.itemSellStatus == T(com.shop.constant.ItemSellStatus).SELL} ? '판매중' : '품절'"></td>
+                <td th:text="${item.itemSellStatus == T(com.shop.shopmasterclone.constant.ItemSellStatus).SELL} ? '판매중' : '품절'"></td>
                 <td th:text="${item.createdBy}"></td>
                 <td th:text="${item.regTime}"></td>
             </tr>
@@ -84,19 +84,19 @@
         <div th:with="start=${(items.number/maxPage)*maxPage + 1}, end=(${(items.totalPages == 0) ? 1 : (start + (maxPage - 1) < items.totalPages ? start + (maxPage - 1) : items.totalPages)})" >
             <ul class="pagination justify-content-center">
 
-                <li class="page-item" th:classappend="${items.first}?'disabled'">
-                    <a th:onclick="'javascript:page(' + ${items.number - 1} + ')'" aria-label='Previous' class="page-link">
-                        <span aria-hidden='true'>Previous</span>
+                <li class="page-item" th:classappend="${items.first} ? 'disabled' : ''">
+                    <a th:attr="onclick=|javascript:page(${items.number - 1})|" aria-label="Previous" class="page-link">
+                        <span aria-hidden="true">Previous</span>
                     </a>
                 </li>
 
-                <li class="page-item" th:each="page: ${#numbers.sequence(start, end)}" th:classappend="${items.number eq page-1}?'active':''">
-                    <a th:onclick="'javascript:page(' + ${page - 1} + ')'" th:inline="text" class="page-link">[[${page}]]</a>
+                <li class="page-item" th:each="page : ${#numbers.sequence(start, end)}" th:classappend="${items.number == page - 1} ? 'active' : ''">
+                    <a th:attr="onclick=|javascript:page(${page - 1})|" class="page-link" th:text="${page}"></a>
                 </li>
 
-                <li class="page-item" th:classappend="${items.last}?'disabled'">
-                    <a th:onclick="'javascript:page(' + ${items.number + 1} + ')'" aria-label='Next' class="page-link">
-                        <span aria-hidden='true'>Next</span>
+                <li class="page-item" th:classappend="${items.last} ? 'disabled' : ''">
+                    <a th:attr="onclick=|javascript:page(${items.number + 1})|" aria-label="Next" class="page-link">
+                        <span aria-hidden="true">Next</span>
                     </a>
                 </li>
 
