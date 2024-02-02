@@ -5,6 +5,7 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.shop.shopmasterclone.constant.ItemSellStatus;
 import com.shop.shopmasterclone.dto.ItemSearchDto;
+import com.shop.shopmasterclone.dto.MainItemDto;
 import com.shop.shopmasterclone.entity.Item;
 import com.shop.shopmasterclone.entity.QItem;
 import jakarta.persistence.EntityManager;
@@ -69,5 +70,14 @@ public class ItemRepositoryCustomImpl implements ItemRepositoryCustom{
                 .fetch();
 
         return new PageImpl<>(content, pageable, content.size());
+    }
+
+    private BooleanExpression itemNmLike(String searchQuery){
+        return StringUtils.isEmpty(searchQuery) ? null : QItem.item.itemNm.like("%"+searchQuery+"%");
+    }
+
+    @Override
+    public Page<MainItemDto> getMainItemPage(ItemSearchDto itemSearchDto, Pageable pageable) {
+        return null;
     }
 }
