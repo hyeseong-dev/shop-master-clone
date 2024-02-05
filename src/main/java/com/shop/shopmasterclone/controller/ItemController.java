@@ -82,8 +82,21 @@ public class ItemController {
         return "item/itemForm";
     }
 
+    /**
+     * 특정 상품의 상세 정보 페이지를 조회하는 메서드입니다.
+     * 상품 ID를 기반으로 상품의 상세 정보를 조회하고, 이 정보를 뷰에 전달합니다.
+     * 조회된 상품 정보는 {@link ItemFormDto} 객체에 담겨 모델을 통해 뷰로 전달됩니다.
+     * 이 메서드는 일반 사용자가 상품의 상세 정보를 보기 위해 사용됩니다.
+     *
+     * @param model 뷰에 전달할 데이터를 담는 모델 객체입니다. 조회된 상품의 상세 정보를 포함합니다.
+     * @param itemId 조회할 상품의 고유 ID입니다. URL 경로에서 해당 ID를 받아옵니다.
+     * @return 상품 상세 정보 페이지의 뷰 이름을 문자열로 반환합니다. 상품 정보가 성공적으로 조회되면, 해당 상품의 상세 정보를 표시하는 뷰로 이동합니다.
+     */
     @GetMapping(value = "/item/{itemId}")
-    public String itemDtl(Model model, @PathVariable("itemId") Long itemId){
+    public String itemDtl(
+            Model model,
+            @PathVariable("itemId") Long itemId
+    ){
         ItemFormDto itemFormDto = itemService.getItemDtl(itemId);
         model.addAttribute("item", itemFormDto);
         return "item/itemDtl";
@@ -124,13 +137,12 @@ public class ItemController {
     }
 
     /**
-     * 새로운 상품을 등록하기 위한 페이지로 이동합니다. 이 메소드는 상품 등록 폼을 제공합니다.
-     * 상품 등록 폼 DTO를 모델에 포함시켜 뷰에 전달합니다.
+     * 상품 등록 폼 페이지로 이동하는 메서드입니다.
+     * 이 메서드는 관리자가 새로운 상품을 등록하기 위한 폼을 제공합니다.
      *
-     * @param model 뷰에 전달할 데이터를 담은 모델 객체
-     * @return 상품 등록 페이지의 뷰 이름
+     * @param model 뷰로 전달할 데이터를 담는 모델 객체입니다. 상품 등록 폼을 구성하는 데 필요한 정보를 포함합니다.
+     * @return 상품 등록 폼이 있는 뷰의 이름을 문자열로 반환합니다.
      */
-
     @GetMapping(value="/admin/item/new")
     public String itemForm(Model model){
         model.addAttribute("itemFormDto", new ItemFormDto());
@@ -138,16 +150,16 @@ public class ItemController {
     }
 
     /**
-     * 사용자로부터 입력 받은 상품 정보와 이미지 파일들을 기반으로 새로운 상품을 등록합니다.
-     * 입력 데이터의 유효성 검사를 수행하고, 상품 정보와 이미지 파일이 유효할 경우 상품을 등록합니다.
-     * 상품 이미지 파일은 첫 번째 이미지를 대표 이미지로 설정합니다.
+     * 새로운 상품을 등록하는 메서드입니다.
+     * 사용자로부터 입력 받은 상품 정보와 이미지 파일들을 검증 후 상품을 등록합니다.
+     * 상품 등록에 실패하거나 입력 데이터에 오류가 있는 경우, 오류 메시지와 함께 상품 등록 폼으로 다시 이동합니다.
      *
-     * @param itemFormDto 등록할 상품 정보가 담긴 DTO 객체
-     * @param bindingResult 입력 데이터의 유효성 검사 결과
-     * @param itemImgFileList 등록할 상품 이미지 파일 리스트
-     * @param model 뷰에 전달할 데이터를 담은 모델 객체
-     * @return 상품 등록 후 리다이렉션할 경로
-     * @throws IllegalArgumentException 첫 번째 이미지 파일이 비어있거나 예외가 발생한 경우
+     * @param itemFormDto 등록할 상품 정보가 담긴 {@link ItemFormDto} 객체입니다. 사용자로부터 입력 받은 데이터를 포함합니다.
+     * @param bindingResult 폼 검증 결과를 담는 {@link BindingResult} 객체입니다. 데이터 바인딩 과정에서 발생한 오류 정보를 포함합니다.
+     * @param itemImgFileList 사용자가 업로드한 상품 이미지 파일 목록입니다. 첫 번째 이미지는 대표 이미지로 설정됩니다.
+     * @param model 뷰로 전달할 데이터를 담는 모델 객체입니다. 오류 메시지 등의 정보를 뷰에 전달하는 데 사용됩니다.
+     * @return 상품 등록 성공 시 메인 페이지로 리다이렉트합니다. 오류가 발생한 경우, 상품 등록 폼 뷰 이름을 반환합니다.
+     * @throws IllegalArgumentException 첫 번째 이미지 파일이 비어있거나, 다른 유효성 검사에서 예외가 발생한 경우에 대한 처리를 포함합니다.
      */
     @PostMapping(value="/admin/item/new")
     public String itemNew(
