@@ -21,7 +21,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 public class SecurityConfig {
 
     @Autowired
-    private AuthenticationEntryPoint unauthorizedHandler;
+    private CustomAuthenticationEntryPoint unauthorizedHandler;
 
     @Autowired
     MemberService memberService;
