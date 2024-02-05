@@ -3,6 +3,7 @@ package com.shop.shopmasterclone.service;
 import com.shop.shopmasterclone.constant.ItemSellStatus;
 import com.shop.shopmasterclone.dto.ItemFormDto;
 import com.shop.shopmasterclone.dto.ItemSearchDto;
+import com.shop.shopmasterclone.dto.MainItemDto;
 import com.shop.shopmasterclone.entity.Item;
 import com.shop.shopmasterclone.entity.ItemImg;
 import com.shop.shopmasterclone.repository.ItemImgRepository;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.TestPropertySource;
@@ -37,6 +39,69 @@ class ItemServiceTest {
 
     @Autowired
     ItemImgRepository itemImgRepository;
+
+    /**
+     * 메인 페이지 상품 조회 기능에 대한 테스트 메서드입니다.
+     * 상품 검색 조건을 주어 관리자 상품 페이지에서 조회할 때 조건에 맞는 상품 페이지가 반환되는지 검증합니다.
+     *
+     * <p>이 테스트는 상품명으로 검색할 때, 검색 조건에 맞는 상품이 포함된 페이지가 정확하게 반환되는지 확인합니다.
+     * 상품 정보와 상품 이미지 파일은 미리 생성하여 데이터베이스에 저장된 상태로 시작합니다.</p>
+     *
+     * <p>Spring Security를 사용하여 테스트 실행 시 모의 사용자를 인증 정보에 추가합니다.</p>
+     *
+     * @throws Exception 상품 정보 및 이미지 파일의 저장 과정에서 발생할 수 있는 예외를 처리합니다.
+     */
+    @Test
+    @DisplayName("메인 페이지 상품 조회 테스트")
+    @WithMockUser(username = "user", roles = "USER")
+    void givenMainPageItemSearchConditions_whenSearchingItems_thenShouldReturnCorrectItemPage() throws Exception {
+        // Given: 상품 정보와 이미지 파일 준비 및 저장
+        createTestItemsWithImages("테스트 상품 1", ItemSellStatus.SELL, 10);
+        createTestItemsWithImages("테스트 상품 2", ItemSellStatus.SELL, 10);
+
+        // 상품 검색 조건 설정
+        ItemSearchDto itemSearchDto = new ItemSearchDto();
+        itemSearchDto.setSearchBy("itemNm");
+        itemSearchDto.setSearchQuery("테스트 상품");
+
+        Pageable pageable = PageRequest.of(0, 5); // 첫 번째 페이지, 페이지 당 5개 항목
+
+        // When: 메인 페이지에서 상품 조회
+        Page<MainItemDto> resultPage = itemService.getMainItemPage(itemSearchDto, pageable);
+
+        // Then: 조회된 상품 페이지 검증
+        assertNotNull(resultPage, "조회된 상품 페이지는 null이 아니어야 합니다.");
+        assertTrue(resultPage.getTotalElements() > 0, "조회된 상품의 총 수가 0보다 커야 합니다.");
+        resultPage.getContent().forEach(item -> {
+            assertTrue(item.getItemNm().contains(itemSearchDto.getSearchQuery()), "상품 이름에 검색 쿼리가 포함되어야 합니다.");
+        });
+    }
+
+    /**
+     * 테스트를 위한 상품 및 상품 이미지 데이터를 생성하고 저장하는 보조 메서드입니다.
+     * 이 메서드는 상품명, 판매 상태, 수량 등의 정보를 받아 상품과 해당 상품의 이미지를 데이터베이스에 저장합니다.
+     * 첫 번째 이미지는 대표 이미지로 설정됩니다.
+     *
+     * <p>이 메서드는 테스트 데이터 준비를 위해 사용되며, 각 테스트 케이스 실행 전에 호출됩니다.</p>
+     *
+     * @param itemName 상품명입니다. 생성할 상품의 이름을 지정합니다.
+     * @param sellStatus 상품의 판매 상태입니다. {@link ItemSellStatus}의 값 중 하나를 사용합니다.
+     * @param quantity 상품의 수량입니다. 생성할 상품의 재고 수량을 지정합니다.
+     * @throws Exception 상품 정보 및 이미지 파일의 저장 과정에서 발생할 수 있는 예외를 처리합니다.
+     */
+    private void createTestItemsWithImages(String itemName, ItemSellStatus sellStatus, int quantity) throws Exception {
+        ItemFormDto itemFormDto = new ItemFormDto();
+        itemFormDto.setItemNm(itemName);
+        itemFormDto.setItemDetail(itemName + " 상세 설명");
+        itemFormDto.setPrice(10000);
+        itemFormDto.setStockNumber(quantity);
+        itemFormDto.setItemSellStatus(sellStatus);
+
+        List<MultipartFile> itemImgFileList = new ArrayList<>();
+        itemImgFileList.add(new MockMultipartFile("file", "test.jpg", "image/jpeg", "test image content".getBytes()));
+
+        itemService.saveItem(itemFormDto, itemImgFileList);
+    }
 
     @Test
     @DisplayName("상품 검색 조건을 사용하여 관리자 상품 페이지에서 조회 시, 조건에 맞는 상품 페이지가 반환되어야 함")
