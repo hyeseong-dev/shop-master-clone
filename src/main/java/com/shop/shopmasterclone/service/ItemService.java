@@ -3,6 +3,7 @@ package com.shop.shopmasterclone.service;
 import com.shop.shopmasterclone.dto.ItemFormDto;
 import com.shop.shopmasterclone.dto.ItemImgDto;
 import com.shop.shopmasterclone.dto.ItemSearchDto;
+import com.shop.shopmasterclone.dto.MainItemDto;
 import com.shop.shopmasterclone.entity.Item;
 import com.shop.shopmasterclone.entity.ItemImg;
 import com.shop.shopmasterclone.repository.ItemImgRepository;
@@ -21,7 +22,7 @@ import java.util.List;
 
 /**
  * 상품 관련 서비스를 제공하는 클래스입니다.
- * 상품의 등록, 수정, 상세 조회 등의 기능을 담당합니다.
+ * 이 클래스는 상품의 등록, 수정, 상세 조회 등의 기능을 담당합니다.
  */
 @Log4j2
 @Service
@@ -32,6 +33,28 @@ public class ItemService {
     private final ItemRepository itemRepository;
     private final ItemImgService itemImgService;
     private final ItemImgRepository itemImgRepository;
+
+    /**
+     * 메인 페이지에 표시할 상품 목록을 조회하는 메서드입니다.
+     * 이 메서드는 상품 검색 조건({@link ItemSearchDto})을 기반으로 상품 목록을 페이징 처리하여 반환합니다.
+     * 검색 조건에는 상품명, 판매 상태, 등록 날짜 등이 포함될 수 있으며, 이를 통해 사용자가 원하는 상품을 쉽게 찾을 수 있습니다.
+     *
+     * <p>페이징 처리는 {@link Pageable} 객체를 통해 구현되며, 클라이언트는 페이지 번호와 페이지 당 항목 수를 지정할 수 있습니다.
+     * 반환되는 {@link Page} 객체에는 조회된 상품 목록과 페이징 정보(총 페이지 수, 총 항목 수 등)가 포함됩니다.</p>
+     *
+     * <p>이 메서드는 읽기 전용 트랜잭션에서 실행되므로, 데이터베이스의 데이터를 변경하지 않습니다.</p>
+     *
+     * @param itemSearchDto 상품 검색 조건을 담고 있는 {@link ItemSearchDto} 객체입니다.
+     *                      이 객체에는 검색할 상품명, 판매 상태, 등록 날짜 범위 등의 조건이 포함될 수 있습니다.
+     * @param pageable 페이징 처리 정보를 담고 있는 {@link Pageable} 객체입니다.
+     *                 이 객체를 통해 요청 페이지 번호와 페이지 당 항목 수를 지정할 수 있습니다.
+     * @return 조건에 맞는 상품 목록과 페이징 정보가 포함된 {@link Page<MainItemDto>} 객체를 반환합니다.
+     *         조회된 상품이 없는 경우, 비어 있는 페이지 객체가 반환될 수 있습니다.
+     */
+    @Transactional(readOnly = true)
+    public Page<MainItemDto> getMainItemPage(ItemSearchDto itemSearchDto, Pageable pageable){
+        return itemRepository.getMainItemPage(itemSearchDto, pageable);
+    }
 
     /**
      * 관리자 상품 페이지를 조회하는 기능입니다.
