@@ -1,6 +1,7 @@
 package com.shop.shopmasterclone.service;
 
 import com.shop.shopmasterclone.constant.ItemSellStatus;
+import com.shop.shopmasterclone.constant.OrderStatus;
 import com.shop.shopmasterclone.dto.ItemFormDto;
 import com.shop.shopmasterclone.dto.MemberFormDto;
 import com.shop.shopmasterclone.dto.OrderDto;
@@ -52,6 +53,32 @@ public class OrderServiceTest {
 
     @Autowired
     private OrderService orderService;
+
+    @Test
+    @DisplayName("아이템의 재고가 주문 취소 후 복구되는지 검증")
+    public void shouldRestoreItemStockWhenOrderIsCancelled() throws Exception{
+        // Given: 주문을 위한 환경 준비
+        String email = "test@example.com";
+        Member member = createTestMember(email);
+        memberService.saveMember(member);
+        Long itemId = createTestItem("테스트 아이템", 10);
+        Item item = itemRepository.findById(itemId)
+                .orElseThrow(() -> new EntityNotFoundException("Item not found for id: " + itemId));
+
+        OrderDto orderDto = new OrderDto();
+        orderDto.setCount(10);
+        orderDto.setItemId(item.getId());
+        Long orderId = orderService.order(orderDto, email);
+
+        // When: 주문 취소 실행
+        orderService.cancelOrder(orderId);
+
+        // Then: 주문 상태와 아이템 재고 수량 검증
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(EntityNotFoundException::new);
+        assertEquals(OrderStatus.CANCEL, order.getOrderStatus(), "주문 상태는 취소되어야 합니다.");
+        assertEquals(10, item.getStockNumber(), "주문 취소 후 아이템의 재고 수량은 복구되어야 합니다.");
+    }
 
     private Member createTestMember(String email) {
         MemberFormDto memberFormDto = new MemberFormDto();
