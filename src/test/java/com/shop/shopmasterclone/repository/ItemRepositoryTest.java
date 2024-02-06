@@ -96,6 +96,7 @@ class ItemRepositoryTest {
     @Test
     @DisplayName("Given 상품 검색 조건 When 관리자 페이지에서 상품을 조회 Then 조건에 맞는 상품만 표시되어야 함")
     public void given_SearchConditions_when_AdminSearchesItems_then_OnlyMatchingItemsShouldBeDisplayed() {
+        itemRepository.deleteAll();
         // Given: 상품 검색 조건을 설정
         Item item = new Item();
         item.setItemNm("Test Item");
