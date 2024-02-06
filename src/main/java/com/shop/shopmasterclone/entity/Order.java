@@ -59,7 +59,7 @@ public class Order extends BaseEntity{
      * @param orderItem 이 주문에 추가할 주문 항목입니다.
      */
     public void addOrderItem(OrderItem orderItem){
-        orderItems.add(orderItem);
+        this.orderItems.add(orderItem);
         orderItem.setOrder(this);
     }
 
@@ -90,9 +90,25 @@ public class Order extends BaseEntity{
      */
     public int getTotalPrice(){
         int totalPrice = 0;
-        for(OrderItem orderItem : orderItems){
+        for(OrderItem orderItem : this.orderItems){
             totalPrice += orderItem.getTotalPrice();
         }
         return totalPrice;
+    }
+
+    /**
+     * 주문을 취소합니다. 주문 상태를 취소로 변경하고, 주문에 포함된 모든 주문 항목도 취소 처리합니다.
+     *
+     * 이 메서드는 주문 상태를 {@link OrderStatus#CANCEL}로 변경하여 주문이 취소되었음을 나타냅니다.
+     * 또한, 주문에 포함된 각 주문 항목에 대해 {@link OrderItem#cancel()} 메서드를 호출하여,
+     * 각 항목의 상태 또한 취소로 변경합니다. 이 과정에서 주문 항목에 설정된 재고 수량은
+     * 원래대로 복구됩니다.
+     */
+    public void cancelOrder(){
+        this.orderStatus = OrderStatus.CANCEL;
+
+        for(OrderItem orderItem: this.orderItems){
+            orderItem.cancel();
+        }
     }
 }
