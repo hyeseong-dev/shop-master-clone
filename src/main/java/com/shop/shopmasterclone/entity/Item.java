@@ -85,5 +85,20 @@ public class Item extends BaseEntity {
             throw new OutofStockException("상품의 재고가 부족합니다. (현재 재고 수량: " + this.stockNumber + ")");
         }
         this.stockNumber = restStock;
+   }
+
+    /**
+     * 상품 재고를 증가시킵니다. 추가될 재고 수량만큼 현재 재고에 더합니다.
+     *
+     * 이 메서드는 주문 취소 또는 반품과 같이 재고를 다시 늘려야 할 때 사용됩니다.
+     *
+     * @param stockNumber 증가시킬 재고의 수량입니다. 이 값은 반드시 양수여야 합니다.
+     * @throws IllegalArgumentException 재고 수량으로 음수가 전달될 때 발생하는 예외입니다.
+     */
+    public void addStock(int stockNumber){
+        if (stockNumber < 0) {
+            throw new IllegalArgumentException("재고를 증가시키기 위한 수량은 양수여야 합니다. 입력된 수량: " + stockNumber);
+        }
+        this.stockNumber += stockNumber;
     }
 }
